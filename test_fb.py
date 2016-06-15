@@ -7,7 +7,7 @@ import os
 import sys
 import numpy as np
 #from .context import util, scripts
-from unformatted import FortranBinary
+from fortran_binary import FortranBinary
 import fb
 
 def mock_it(builtin_name):
