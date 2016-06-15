@@ -133,7 +133,15 @@ class TestFortranBinary(unittest.TestCase):
         fb.close()
 
     def test_4(self):
-        """Read string"""
+        """Read string
+
+        character*3 x
+        x = 'ABC'
+        open(4, file='fort.4', status='new', form='unformatted')
+        write(4) x
+        close(4)
+        end
+        """
         ffile = os.path.join(self.tdir, 'fort.4')
         fb = FortranBinary(ffile)
         rec = fb.find('ABC')
@@ -153,6 +161,14 @@ class TestFortranBinary(unittest.TestCase):
         fb = FortranBinary(ffile)
         with self.assertRaises(ValueError):
             rec = fb.find(1.0)
+        fb.close()
+
+    def test_4d(self):
+        """Read string"""
+        ffile = os.path.join(self.tdir, 'fort.4')
+        fb = FortranBinary(ffile)
+        rec = next(fb)
+        self.assertEqual(fb.reclen, 3)
         fb.close()
 
 

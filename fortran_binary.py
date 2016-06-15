@@ -59,10 +59,6 @@ class FortranBinary(object):
             if blabel in rec:
                 return rec
 
-    def close_(self):
-        """Close file"""
-        self.file.close()
-
     def record_byte_lengths(self):
         """Return record byte lengths in file as tuple"""
 
