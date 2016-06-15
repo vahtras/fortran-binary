@@ -1,5 +1,5 @@
 import argparse
-from unformatted import FortranBinary
+from fortran_binary import FortranBinary
 
 def main():
     parser = argparse.ArgumentParser()
