@@ -7,6 +7,6 @@ setup(
     version="1.0",
     url="https://github.com/vahtras/fortran-binary",
     py_modules=["fortran_binary"],
-    scripts=["fb.py"],
+    scripts=["forbin"],
     install_requires=["numpy"],
 )

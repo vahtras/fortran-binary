@@ -7,8 +7,7 @@ import os
 import sys
 import numpy as np
 #from .context import util, scripts
-from fortran_binary import FortranBinary
-import fb
+from fortran_binary import FortranBinary, main
 
 def mock_it(builtin_name):
    name = ('builtins.%s' if sys.version_info >= (3,) else '__builtin__.%s') % builtin_name
@@ -166,7 +165,7 @@ class TestFortranBinary(unittest.TestCase):
     def test_as_script(self):
         import sys
         sys.argv[1:] = [os.path.join(self.tdir, 'fort.3'), '--records']
-        fb.main()
+        main()
         if hasattr(sys.stdout, "getvalue"):
             print_output = sys.stdout.getvalue().strip()
             self.assertEqual(print_output, '(16, 24, 24)')
