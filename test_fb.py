@@ -44,6 +44,15 @@ class TestFortranBinary(unittest.TestCase):
         np.testing.assert_allclose(x, xref)
         fb.close()
 
+    def test_1_cm(self):
+        """Case 1 with context manager"""
+        ffile = os.path.join(self.tdir, 'fort.1')
+        with FortranBinary(ffile) as fb:
+            n = next(fb).read(1, 'i')[0]
+            x = next(fb).read(n, 'd')
+        np.testing.assert_allclose(x, (1., 2., 3.))
+
+
     def test_2(self):
         """Find and read label
 
@@ -64,6 +73,15 @@ class TestFortranBinary(unittest.TestCase):
         self.assertEqual(rec.data, b'LABEL')
         fb.close()
 
+    def test_2_cm(self):
+        """
+        Case 2 with context manager
+        """
+        ffile = os.path.join(self.tdir, 'fort.2')
+        with FortranBinary(ffile) as fb:
+            rec  = fb.find(b'LABEL')
+        self.assertEqual(rec.data, b'LABEL')
+
     def test_2b(self):
         """Handle label not found
 
@@ -82,6 +100,15 @@ class TestFortranBinary(unittest.TestCase):
         rec  = fb.find(b'NOLABEL')
         fb.close()
 
+        self.assertEqual(rec, None)
+
+    def test_2b_cm(self):
+        """
+        Case 2b with context manager
+        """
+        ffile = os.path.join(self.tdir, 'fort.2')
+        with FortranBinary(ffile) as fb:
+            rec  = fb.find(b'NOLABEL')
         self.assertEqual(rec, None)
 
     def test_3a(self):
@@ -105,6 +132,13 @@ class TestFortranBinary(unittest.TestCase):
         nx, ny = fb.next().read('q', 2)
         np.testing.assert_allclose((nx, ny), (3, 3))
         fb.close()
+
+    def test_3a_cm(self):
+        """Case 3a with context manager """
+        ffile = os.path.join(self.tdir, 'fort.3')
+        with FortranBinary(ffile) as fb:
+            nx, ny = fb.next().read('q', 2)
+        np.testing.assert_allclose((nx, ny), (3, 3))
 
     def test_3b(self):
         """Read vecs
@@ -132,6 +166,17 @@ class TestFortranBinary(unittest.TestCase):
         np.testing.assert_allclose(x, xref)
         fb.close()
 
+    def test_3b_cm(self):
+        """Case 3b with context manager"""
+        ffile = os.path.join(self.tdir, 'fort.3')
+        with FortranBinary(ffile) as fb:
+            fb.next()
+            x=[]
+            for rec in fb:
+                x += list(fb.readbuf(3, 'd'))
+        xref = (1., 2., 3.,  5., 6., 7.)
+        np.testing.assert_allclose(x, xref)
+
     def test_4(self):
         """Read string
 
@@ -147,6 +192,13 @@ class TestFortranBinary(unittest.TestCase):
         rec = fb.find('ABC')
         self.assertIn(b'ABC', rec)
 
+    def test_4_cm(self):
+        """Case 4 with context manager"""
+        ffile = os.path.join(self.tdir, 'fort.4')
+        with FortranBinary(ffile) as fb:
+            rec = fb.find('ABC')
+        self.assertIn(b'ABC', rec)
+
     def test_4b(self):
         """Read string"""
         ffile = os.path.join(self.tdir, 'fort.4')
@@ -154,6 +206,13 @@ class TestFortranBinary(unittest.TestCase):
         rec = fb.find(b'ABC')
         self.assertIn(b'ABC', rec)
         fb.close()
+
+    def test_4b_cm(self):
+        """Read string with context manager"""
+        ffile = os.path.join(self.tdir, 'fort.4')
+        with FortranBinary(ffile) as fb:
+            rec = fb.find(b'ABC')
+        self.assertIn(b'ABC', rec)
 
     def test_4c(self):
         """Read string"""
@@ -163,6 +222,13 @@ class TestFortranBinary(unittest.TestCase):
             rec = fb.find(1.0)
         fb.close()
 
+    def test_4c_cm(self):
+        """Read string with context manager"""
+        ffile = os.path.join(self.tdir, 'fort.4')
+        with FortranBinary(ffile) as fb:
+            with self.assertRaises(ValueError):
+                rec = fb.find(1.0)
+
     def test_4d(self):
         """Read string"""
         ffile = os.path.join(self.tdir, 'fort.4')
@@ -171,12 +237,24 @@ class TestFortranBinary(unittest.TestCase):
         self.assertEqual(fb.reclen, 3)
         fb.close()
 
+    def test_4d_cm(self):
+        """Read string with context manager"""
+        ffile = os.path.join(self.tdir, 'fort.4')
+        with FortranBinary(ffile) as fb:
+            rec = next(fb)
+        self.assertEqual(fb.reclen, 3)
+
 
     def test_count_records_and_lengths(self):
         ffile = os.path.join(self.tdir, 'fort.3')
         fb = FortranBinary(ffile)
         self.assertTupleEqual(fb.record_byte_lengths(), (16, 24, 24))
         fb.close()
+
+    def test_count_records_and_lengths_cm(self):
+        ffile = os.path.join(self.tdir, 'fort.3')
+        with FortranBinary(ffile) as fb:
+            self.assertTupleEqual(fb.record_byte_lengths(), (16, 24, 24))
 
     def test_as_script(self):
         import sys

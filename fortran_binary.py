@@ -65,6 +65,12 @@ class FortranBinary(object):
         reclengths = [record.reclen for record in self]
         return tuple(reclengths)
 
+    def __enter__(self, *args, **kwargs):
+        return self
+
+    def __exit__(self, *args, **kwargs):
+        pass
+
     def __getattr__(self, attr):
         """Delegate unknown attributes to file member"""
         return getattr(self.file, attr)
