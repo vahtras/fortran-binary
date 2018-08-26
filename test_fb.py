@@ -242,7 +242,7 @@ class TestFortranBinary(unittest.TestCase):
         ffile = os.path.join(self.tdir, 'fort.4')
         with FortranBinary(ffile) as fb:
             rec = next(fb)
-        self.assertEqual(fb.reclen, 3)
+        self.assertEqual(len(rec), 3)
 
 
     def test_count_records_and_lengths(self):

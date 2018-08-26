@@ -86,6 +86,9 @@ class Rec(object):
     def __contains__(self, obj):
         return obj in self.data
 
+    def __len__(self):
+        return len(self.data)
+
     @property
     def reclen(self):
         return len(self.data)
