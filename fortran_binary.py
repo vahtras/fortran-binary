@@ -16,6 +16,7 @@ class FortranBinary(object):
         self.data = None
         self.rec = None
 
+
     @property
     def reclen(self):
         return self.rec.reclen
@@ -82,6 +83,9 @@ class Rec(object):
     def __init__(self, data):
         self.data = data
         self.loc = 0
+
+    def __str__(self):
+        return str(self.data)
 
     def __contains__(self, obj):
         return obj in self.data

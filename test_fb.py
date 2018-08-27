@@ -82,6 +82,15 @@ class TestFortranBinary(unittest.TestCase):
             rec  = fb.find(b'LABEL')
         self.assertEqual(rec.data, b'LABEL')
 
+    def test_2_str(self):
+        """
+        Case 2 with str method
+        """
+        ffile = os.path.join(self.tdir, 'fort.2')
+        with FortranBinary(ffile) as fb:
+            rec  = fb.find(b'LABEL')
+        self.assertEqual(rec.data.decode('utf-8'), 'LABEL')
+
     def test_2b(self):
         """Handle label not found
 
