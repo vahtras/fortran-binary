@@ -1,4 +1,5 @@
 import unittest
+import pytest
 try:
     import mock
 except ImportError:#pragma: no cover
@@ -243,7 +244,16 @@ class TestFortranBinary(unittest.TestCase):
         ffile = os.path.join(self.tdir, 'fort.4')
         fb = FortranBinary(ffile)
         rec = next(fb)
-        self.assertEqual(fb.reclen, 3)
+        self.assertEqual(len(rec), 3)
+        fb.close()
+
+    def test_4d_warn(self):
+        """Read string"""
+        ffile = os.path.join(self.tdir, 'fort.4')
+        fb = FortranBinary(ffile)
+        rec = next(fb)
+        with pytest.deprecated_call():
+            l = fb.reclen
         fb.close()
 
     def test_4d_cm(self):
