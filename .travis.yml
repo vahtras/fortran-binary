@@ -19,8 +19,9 @@ before_install:
   - export PATH="$HOME/miniconda/bin:$PATH"
   - #conda update --yes conda
 install:
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION pip numpy scipy nose pytest pytest-cov mock
-  - pip install pep8 python-coveralls
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION pip numpy scipy pytest pytest-cov mock
+  - pip intsall -r requirements-dev.txt
+  - pip install python-coveralls
 script:
   - make coverage
 after_success:
