@@ -20,7 +20,7 @@ before_install:
 install:
   - conda create -y --name travis python=$TRAVIS_PYTHON_VERSION && source activate travis
   - python -m pip install numpy 
-  - python -m pip install pytest-cov python-coveralls
+  - python -m pip install pytest-cov python-coveralls mock
   - python -m pip install --upgrade coverage
 script:
   - make coverage
