@@ -20,7 +20,7 @@ before_install:
   - #conda update --yes conda
 install:
   - conda install --yes python=$TRAVIS_PYTHON_VERSION pip numpy scipy pytest pytest-cov mock
-  - pip intsall -r requirements-dev.txt
+  - pip install -r requirements-dev.txt
   - pip install python-coveralls
 script:
   - make coverage
