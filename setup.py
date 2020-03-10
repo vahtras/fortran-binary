@@ -10,4 +10,5 @@ setup(
     py_modules=["fortran_binary"],
     scripts=["forbin"],
     install_requires=["numpy"],
+    description="Utility for reading Fortran binary files",
 )
