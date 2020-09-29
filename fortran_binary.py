@@ -6,6 +6,7 @@ __version__ = "1.0.4"
 import struct
 import warnings
 
+
 class FortranBinary(object):
     """Class for binary files compatible with Fortran Unformatted I/O"""
 
@@ -17,7 +18,6 @@ class FortranBinary(object):
         self.data = None
         self.rec = None
 
-
     @property
     def reclen(self):
         warnings.warn("FortranBinary.reclen depracated", DeprecationWarning)
@@ -26,14 +26,14 @@ class FortranBinary(object):
     def __iter__(self):
         return self
 
-    def __next__(self): #pragma: no cover
+    def __next__(self):  # pragma: no cover
         return self.next()
 
     def next(self):
         """Read a Fortran record"""
         head = self.file.read(self.pad)
         if head:
-            record_size = struct.unpack('i', head)[0]
+            record_size = struct.unpack("i", head)[0]
             self.data = self.file.read(record_size)
             tail = self.file.read(self.pad)
             assert head == tail
@@ -51,7 +51,7 @@ class FortranBinary(object):
         """Find string label in file"""
         if isinstance(label, str):
             try:
-                blabel = bytes(label, 'utf-8')
+                blabel = bytes(label, "utf-8")
             except TypeError:
                 blabel = label
         elif isinstance(label, bytes):
@@ -79,6 +79,7 @@ class FortranBinary(object):
         """Delegate unknown attributes to file member"""
         return getattr(self.file, attr)
 
+
 class Rec(object):
     """Representation of a single Fortran record"""
 
@@ -101,22 +102,24 @@ class Rec(object):
 
     def read(self, num, fmt):
         """Read data from current record"""
-        start, stop = self.loc, self.loc+struct.calcsize(fmt*num)
-        vec = struct.unpack(fmt*num, self.data[start:stop])
+        start, stop = self.loc, self.loc + struct.calcsize(fmt * num)
+        vec = struct.unpack(fmt * num, self.data[start:stop])
         self.loc = stop
         return vec
 
+
 def main():
-    import argparse 
+    import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--records', action='store_true', help='List record lengths')
-    parser.add_argument('filename', help='Fortran binary flie')
+    parser.add_argument("--records", action="store_true", help="List record lengths")
+    parser.add_argument("filename", help="Fortran binary flie")
     args = parser.parse_args()
 
     if args.records:
         file_ = FortranBinary(args.filename)
         print(file_.record_byte_lengths())
 
-if __name__ == "__main__": #pragma: no cover
+
+if __name__ == "__main__":  # pragma: no cover
     pass
