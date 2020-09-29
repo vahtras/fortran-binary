@@ -1,4 +1,3 @@
-import unittest
 from unittest import mock
 import os
 
@@ -8,8 +7,8 @@ import pytest
 from fortran_binary import FortranBinary, main
 
 
-class TestFortranBinary(unittest.TestCase):
-    def setUp(self):
+class TestFortranBinary:
+    def setup(self):
         self.tdir = os.path.join(os.path.split(__file__)[0], "test_fb.d")
 
     def test_1(self):
@@ -29,7 +28,7 @@ class TestFortranBinary(unittest.TestCase):
         # first record is int 3
         next(fb)
         n = fb.readbuf(1, "i")[0]
-        self.assertEqual(n, 3)
+        assert n == 3
 
         # first record is float 1. 2. 3.
         next(fb)
@@ -63,7 +62,7 @@ class TestFortranBinary(unittest.TestCase):
         fb = FortranBinary(ffile)
         rec = fb.find(b"LABEL")
 
-        self.assertEqual(rec.data, b"LABEL")
+        assert rec.data == b"LABEL"
         fb.close()
 
     def test_2_cm(self):
@@ -73,7 +72,7 @@ class TestFortranBinary(unittest.TestCase):
         ffile = os.path.join(self.tdir, "fort.2")
         with FortranBinary(ffile) as fb:
             rec = fb.find(b"LABEL")
-        self.assertEqual(rec.data, b"LABEL")
+        assert rec.data == b"LABEL"
 
     def test_2_str(self):
         """
@@ -82,7 +81,7 @@ class TestFortranBinary(unittest.TestCase):
         ffile = os.path.join(self.tdir, "fort.2")
         with FortranBinary(ffile) as fb:
             rec = fb.find(b"LABEL")
-        self.assertEqual(rec.data.decode("utf-8"), "LABEL")
+        assert rec.data.decode("utf-8") == "LABEL"
 
     def test_2b(self):
         """Handle label not found
@@ -102,7 +101,7 @@ class TestFortranBinary(unittest.TestCase):
         rec = fb.find(b"NOLABEL")
         fb.close()
 
-        self.assertEqual(rec, None)
+        assert rec is None
 
     def test_2b_cm(self):
         """
@@ -111,7 +110,7 @@ class TestFortranBinary(unittest.TestCase):
         ffile = os.path.join(self.tdir, "fort.2")
         with FortranBinary(ffile) as fb:
             rec = fb.find(b"NOLABEL")
-        self.assertEqual(rec, None)
+        assert rec is None
 
     def test_3a(self):
         """Integer*8 dimensions
@@ -192,21 +191,21 @@ class TestFortranBinary(unittest.TestCase):
         ffile = os.path.join(self.tdir, "fort.4")
         fb = FortranBinary(ffile)
         rec = fb.find("ABC")
-        self.assertIn(b"ABC", rec)
+        assert b"ABC" in rec
 
     def test_4_cm(self):
         """Case 4 with context manager"""
         ffile = os.path.join(self.tdir, "fort.4")
         with FortranBinary(ffile) as fb:
             rec = fb.find("ABC")
-        self.assertIn(b"ABC", rec)
+        assert b"ABC" in rec
 
     def test_4b(self):
         """Read string"""
         ffile = os.path.join(self.tdir, "fort.4")
         fb = FortranBinary(ffile)
         rec = fb.find(b"ABC")
-        self.assertIn(b"ABC", rec)
+        assert b"ABC" in rec
         fb.close()
 
     def test_4b_cm(self):
@@ -214,13 +213,13 @@ class TestFortranBinary(unittest.TestCase):
         ffile = os.path.join(self.tdir, "fort.4")
         with FortranBinary(ffile) as fb:
             rec = fb.find(b"ABC")
-        self.assertIn(b"ABC", rec)
+        assert b"ABC" in rec
 
     def test_4c(self):
         """Read string"""
         ffile = os.path.join(self.tdir, "fort.4")
         fb = FortranBinary(ffile)
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             fb.find(1.0)
         fb.close()
 
@@ -228,7 +227,7 @@ class TestFortranBinary(unittest.TestCase):
         """Read string with context manager"""
         ffile = os.path.join(self.tdir, "fort.4")
         with FortranBinary(ffile) as fb:
-            with self.assertRaises(ValueError):
+            with pytest.raises(ValueError):
                 fb.find(1.0)
 
     def test_4d(self):
@@ -236,7 +235,7 @@ class TestFortranBinary(unittest.TestCase):
         ffile = os.path.join(self.tdir, "fort.4")
         fb = FortranBinary(ffile)
         rec = next(fb)
-        self.assertEqual(len(rec), 3)
+        assert len(rec) == 3
         fb.close()
 
     def test_4d_warn(self):
@@ -253,18 +252,18 @@ class TestFortranBinary(unittest.TestCase):
         ffile = os.path.join(self.tdir, "fort.4")
         with FortranBinary(ffile) as fb:
             rec = next(fb)
-        self.assertEqual(len(rec), 3)
+        assert len(rec) == 3
 
     def test_count_records_and_lengths(self):
         ffile = os.path.join(self.tdir, "fort.3")
         fb = FortranBinary(ffile)
-        self.assertTupleEqual(fb.record_byte_lengths(), (16, 24, 24))
+        assert fb.record_byte_lengths() == (16, 24, 24)
         fb.close()
 
     def test_count_records_and_lengths_cm(self):
         ffile = os.path.join(self.tdir, "fort.3")
         with FortranBinary(ffile) as fb:
-            self.assertTupleEqual(fb.record_byte_lengths(), (16, 24, 24))
+            assert fb.record_byte_lengths() == (16, 24, 24)
 
     def test_as_script(self):
         import sys
@@ -273,11 +272,11 @@ class TestFortranBinary(unittest.TestCase):
         main()
         if hasattr(sys.stdout, "getvalue"):
             print_output = sys.stdout.getvalue().strip()
-            self.assertEqual(print_output, "(16, 24, 24)")
+            assert print_output == "(16, 24, 24)"
 
     def test_open_non_existing(self):
         ffile = os.path.join(self.tdir, "nofile")
-        with self.assertRaises(IOError):
+        with pytest.raises(IOError):
             FortranBinary(ffile)
 
     @mock.patch("fortran_binary.open")
