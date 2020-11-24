@@ -1,3 +1,4 @@
+import array
 from unittest import mock
 import os
 
@@ -44,6 +45,13 @@ class TestFortranBinary:
             n = next(fb).read(1, "i")[0]
             x = next(fb).read(n, "d")
         np.testing.assert_allclose(x, (1.0, 2.0, 3.0))
+
+    def test_1_as_float(self):
+        ffile = os.path.join(self.tdir, "fort.1")
+        for record in FortranBinary(ffile):
+            pass
+
+        assert record.as_array() == array.array('d', (1.0, 2.0, 3.0))
 
     def test_2(self):
         """Find and read label

@@ -5,6 +5,7 @@
 __version__ = "1.0.4"
 import struct
 import warnings
+import array
 
 
 class FortranBinary(object):
@@ -106,6 +107,11 @@ class Rec(object):
         vec = struct.unpack(fmt * num, self.data[start:stop])
         self.loc = stop
         return vec
+
+    def as_array(self, fmt='d'):
+        size_of_fmt = struct.calcsize(fmt)
+        data = self.read(len(self) // size_of_fmt, fmt)
+        return array.array(fmt, data)
 
 
 def main():
