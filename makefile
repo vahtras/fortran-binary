@@ -1,6 +1,6 @@
 test:
-	python -m pytest -qx test_fb.py
+	python -m pytest -qx tests
 debug:
-	python -m pytest -qx test_fb.py --pdb
+	python -m pytest -qx tests --pdb
 coverage:
-	python -m pytest -v test_fb.py --cov fortran_binary --cov-report html --cov-report term
+	python -m pytest -v tests --cov fortran_binary --cov-report html --cov-report term
