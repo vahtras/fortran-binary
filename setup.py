@@ -1,4 +1,7 @@
 from setuptools import setup
+setup()
+
+"""
 from fortran_binary import __version__
 
 setup(
@@ -12,3 +15,4 @@ setup(
     install_requires=["numpy"],
     description="Utility for reading Fortran binary files",
 )
+"""
