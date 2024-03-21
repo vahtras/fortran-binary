@@ -24,7 +24,7 @@ jobs:
         python -m pip install .
     - name: Test
       run: |
-        pip install pytest
+        pip install pytest pytest-cov numpy
         python -m pytest
     - name: Build package
       run: python -m build
