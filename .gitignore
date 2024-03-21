@@ -6,3 +6,5 @@ dist
 *egg-info
 .coverage
 htmlcov
+.python-version
+.tox

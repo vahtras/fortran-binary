@@ -1,6 +1,7 @@
 import array
-from unittest import mock
 import os
+import pathlib
+from unittest import mock
 
 import numpy as np
 import pytest
@@ -9,8 +10,8 @@ from fortran_binary import FortranBinary, main
 
 
 class TestFortranBinary:
-    def setup(self):
-        self.tdir = os.path.join(os.path.split(__file__)[0], "test_fb.d")
+    def setup_method(self):
+        self.tdir = pathlib.Path(__file__).parent / "test_fb.d"
 
     def test_1(self):
         """Read int, float
@@ -24,7 +25,7 @@ class TestFortranBinary:
           close(1)
           end
         """
-        ffile = os.path.join(self.tdir, "fort.1")
+        ffile = self.tdir / "fort.1"
         fb = FortranBinary(ffile)
         # first record is int 3
         next(fb)
@@ -40,14 +41,14 @@ class TestFortranBinary:
 
     def test_1_cm(self):
         """Case 1 with context manager"""
-        ffile = os.path.join(self.tdir, "fort.1")
+        ffile = self.tdir / "fort.1"
         with FortranBinary(ffile) as fb:
             n = next(fb).read(1, "i")[0]
             x = next(fb).read(n, "d")
         np.testing.assert_allclose(x, (1.0, 2.0, 3.0))
 
     def test_1_as_float(self):
-        ffile = os.path.join(self.tdir, "fort.1")
+        ffile = self.tdir / "fort.1"
         for record in FortranBinary(ffile):
             pass
 
@@ -66,7 +67,7 @@ class TestFortranBinary:
           close(1)
           end
         """
-        ffile = os.path.join(self.tdir, "fort.2")
+        ffile = self.tdir / "fort.2"
         fb = FortranBinary(ffile)
         rec = fb.find(b"LABEL")
 
@@ -77,7 +78,7 @@ class TestFortranBinary:
         """
         Case 2 with context manager
         """
-        ffile = os.path.join(self.tdir, "fort.2")
+        ffile = self.tdir / "fort.2"
         with FortranBinary(ffile) as fb:
             rec = fb.find(b"LABEL")
         assert rec.data == b"LABEL"
@@ -86,7 +87,7 @@ class TestFortranBinary:
         """
         Case 2 with str method
         """
-        ffile = os.path.join(self.tdir, "fort.2")
+        ffile = self.tdir / "fort.2"
         with FortranBinary(ffile) as fb:
             rec = fb.find(b"LABEL")
         assert rec.data.decode("utf-8") == "LABEL"
@@ -104,7 +105,7 @@ class TestFortranBinary:
           close(1)
           end
         """
-        ffile = os.path.join(self.tdir, "fort.2")
+        ffile = self.tdir / "fort.2"
         fb = FortranBinary(ffile)
         rec = fb.find(b"NOLABEL")
         fb.close()
@@ -115,7 +116,7 @@ class TestFortranBinary:
         """
         Case 2b with context manager
         """
-        ffile = os.path.join(self.tdir, "fort.2")
+        ffile = self.tdir / "fort.2"
         with FortranBinary(ffile) as fb:
             rec = fb.find(b"NOLABEL")
         assert rec is None
@@ -135,7 +136,7 @@ class TestFortranBinary:
           end
 
         """
-        ffile = os.path.join(self.tdir, "fort.3")
+        ffile = self.tdir / "fort.3"
         fb = FortranBinary(ffile)
         # first record is int 3, 3
         nx, ny = fb.next().read("q", 2)
@@ -144,7 +145,7 @@ class TestFortranBinary:
 
     def test_3a_cm(self):
         """Case 3a with context manager """
-        ffile = os.path.join(self.tdir, "fort.3")
+        ffile = self.tdir / "fort.3"
         with FortranBinary(ffile) as fb:
             nx, ny = fb.next().read("q", 2)
         np.testing.assert_allclose((nx, ny), (3, 3))
@@ -164,7 +165,7 @@ class TestFortranBinary:
           end
 
         """
-        ffile = os.path.join(self.tdir, "fort.3")
+        ffile = self.tdir / "fort.3"
         fb = FortranBinary(ffile)
         # first record is int 3
         fb.next()
@@ -177,7 +178,7 @@ class TestFortranBinary:
 
     def test_3b_cm(self):
         """Case 3b with context manager"""
-        ffile = os.path.join(self.tdir, "fort.3")
+        ffile = self.tdir / "fort.3"
         with FortranBinary(ffile) as fb:
             fb.next()
             x = []
@@ -196,21 +197,21 @@ class TestFortranBinary:
         close(4)
         end
         """
-        ffile = os.path.join(self.tdir, "fort.4")
+        ffile = self.tdir / "fort.4"
         fb = FortranBinary(ffile)
         rec = fb.find("ABC")
         assert b"ABC" in rec
 
     def test_4_cm(self):
         """Case 4 with context manager"""
-        ffile = os.path.join(self.tdir, "fort.4")
+        ffile = self.tdir / "fort.4"
         with FortranBinary(ffile) as fb:
             rec = fb.find("ABC")
         assert b"ABC" in rec
 
     def test_4b(self):
         """Read string"""
-        ffile = os.path.join(self.tdir, "fort.4")
+        ffile = self.tdir / "fort.4"
         fb = FortranBinary(ffile)
         rec = fb.find(b"ABC")
         assert b"ABC" in rec
@@ -218,14 +219,14 @@ class TestFortranBinary:
 
     def test_4b_cm(self):
         """Read string with context manager"""
-        ffile = os.path.join(self.tdir, "fort.4")
+        ffile = self.tdir / "fort.4"
         with FortranBinary(ffile) as fb:
             rec = fb.find(b"ABC")
         assert b"ABC" in rec
 
     def test_4c(self):
         """Read string"""
-        ffile = os.path.join(self.tdir, "fort.4")
+        ffile = self.tdir / "fort.4"
         fb = FortranBinary(ffile)
         with pytest.raises(ValueError):
             fb.find(1.0)
@@ -233,14 +234,14 @@ class TestFortranBinary:
 
     def test_4c_cm(self):
         """Read string with context manager"""
-        ffile = os.path.join(self.tdir, "fort.4")
+        ffile = self.tdir / "fort.4"
         with FortranBinary(ffile) as fb:
             with pytest.raises(ValueError):
                 fb.find(1.0)
 
     def test_4d(self):
         """Read string"""
-        ffile = os.path.join(self.tdir, "fort.4")
+        ffile = self.tdir / "fort.4"
         fb = FortranBinary(ffile)
         rec = next(fb)
         assert len(rec) == 3
@@ -248,7 +249,7 @@ class TestFortranBinary:
 
     def test_4d_warn(self):
         """Read string"""
-        ffile = os.path.join(self.tdir, "fort.4")
+        ffile = self.tdir / "fort.4"
         fb = FortranBinary(ffile)
         next(fb)
         with pytest.deprecated_call():
@@ -257,38 +258,38 @@ class TestFortranBinary:
 
     def test_4d_cm(self):
         """Read string with context manager"""
-        ffile = os.path.join(self.tdir, "fort.4")
+        ffile = self.tdir / "fort.4"
         with FortranBinary(ffile) as fb:
             rec = next(fb)
         assert len(rec) == 3
 
     def test_count_records_and_lengths(self):
-        ffile = os.path.join(self.tdir, "fort.3")
+        ffile = self.tdir / "fort.3"
         fb = FortranBinary(ffile)
         assert fb.record_byte_lengths() == (16, 24, 24)
         fb.close()
 
     def test_count_records_and_lengths_cm(self):
-        ffile = os.path.join(self.tdir, "fort.3")
+        ffile = self.tdir / "fort.3"
         with FortranBinary(ffile) as fb:
             assert fb.record_byte_lengths() == (16, 24, 24)
 
     def test_as_script(self):
         import sys
 
-        sys.argv[1:] = [os.path.join(self.tdir, "fort.3"), "--records"]
+        sys.argv[1:] = [f'{self.tdir / "fort.3"}', "--records"]
         main()
         if hasattr(sys.stdout, "getvalue"):
             print_output = sys.stdout.getvalue().strip()
             assert print_output == "(16, 24, 24)"
 
     def test_open_non_existing(self):
-        ffile = os.path.join(self.tdir, "nofile")
+        ffile = self.tdir / "nofile"
         with pytest.raises(IOError):
             FortranBinary(ffile)
 
     @mock.patch("fortran_binary.open")
     def test_open_new(self, mock_open):
-        ffile = os.path.join(self.tdir, "newfile")
+        ffile = self.tdir / "newfile"
         FortranBinary(ffile, "wb")
         mock_open.assert_called_once_with(ffile, "wb")
