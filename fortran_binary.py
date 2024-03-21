@@ -8,8 +8,10 @@ import warnings
 import array
 
 
-class FortranBinary(object):
-    """Class for binary files compatible with Fortran Unformatted I/O"""
+class FortranBinary:
+    """
+    Class for binary files compatible with Fortran Unformatted I/O
+    """
 
     pad = 4
 
@@ -21,17 +23,16 @@ class FortranBinary(object):
 
     @property
     def reclen(self):
-        warnings.warn("FortranBinary.reclen depracated", DeprecationWarning)
+        warnings.warn("FortranBinary.reclen deprecated", DeprecationWarning)
         return self.rec.reclen
 
     def __iter__(self):
         return self
 
-    def __next__(self):  # pragma: no cover
-        return self.next()
-
-    def next(self):
-        """Read a Fortran record"""
+    def __next__(self):
+        """
+        Read a Fortran record
+        """
         head = self.file.read(self.pad)
         if head:
             record_size = struct.unpack("i", head)[0]
@@ -44,12 +45,16 @@ class FortranBinary(object):
             raise StopIteration
 
     def readbuf(self, num, fmt):
-        """Read data from current record"""
+        """
+        Read data from current record
+        """
         vec = self.rec.read(num, fmt)
         return vec
 
     def find(self, label):
-        """Find string label in file"""
+        """
+        Find string label in file
+        """
         if isinstance(label, str):
             try:
                 blabel = bytes(label, "utf-8")
@@ -65,7 +70,9 @@ class FortranBinary(object):
                 return rec
 
     def record_byte_lengths(self):
-        """Return record byte lengths in file as tuple"""
+        """
+        Return record byte lengths in file as tuple
+        """
 
         reclengths = [record.reclen for record in self]
         return tuple(reclengths)
@@ -77,12 +84,16 @@ class FortranBinary(object):
         pass
 
     def __getattr__(self, attr):
-        """Delegate unknown attributes to file member"""
+        """
+        Delegate unknown attributes to file member
+        """
         return getattr(self.file, attr)
 
 
 class Rec(object):
-    """Representation of a single Fortran record"""
+    """
+    Representation of a single Fortran record
+    """
 
     def __init__(self, data):
         self.data = data
@@ -102,7 +113,9 @@ class Rec(object):
         return len(self.data)
 
     def read(self, num, fmt):
-        """Read data from current record"""
+        """
+        Read data from current record
+        """
         start, stop = self.loc, self.loc + struct.calcsize(fmt * num)
         vec = struct.unpack(fmt * num, self.data[start:stop])
         self.loc = stop

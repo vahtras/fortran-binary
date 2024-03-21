@@ -139,7 +139,7 @@ class TestFortranBinary:
         ffile = self.tdir / "fort.3"
         fb = FortranBinary(ffile)
         # first record is int 3, 3
-        nx, ny = fb.next().read("q", 2)
+        nx, ny = next(fb).read("q", 2)
         np.testing.assert_allclose((nx, ny), (3, 3))
         fb.close()
 
@@ -147,7 +147,7 @@ class TestFortranBinary:
         """Case 3a with context manager """
         ffile = self.tdir / "fort.3"
         with FortranBinary(ffile) as fb:
-            nx, ny = fb.next().read("q", 2)
+            nx, ny = next(fb).read("q", 2)
         np.testing.assert_allclose((nx, ny), (3, 3))
 
     def test_3b(self):
@@ -168,7 +168,7 @@ class TestFortranBinary:
         ffile = self.tdir / "fort.3"
         fb = FortranBinary(ffile)
         # first record is int 3
-        fb.next()
+        next(fb)
         x = []
         for rec in fb:
             x += list(fb.readbuf(3, "d"))
@@ -180,7 +180,7 @@ class TestFortranBinary:
         """Case 3b with context manager"""
         ffile = self.tdir / "fort.3"
         with FortranBinary(ffile) as fb:
-            fb.next()
+            next(fb)
             x = []
             for rec in fb:
                 x += list(fb.readbuf(3, "d"))
