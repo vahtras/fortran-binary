@@ -1,0 +1,23 @@
+[project]
+name = "fortran-binary"
+version = "1.0.9"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Olav Vahtras", email = "vahtras@kth.se" }
+]
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+fortran-binary = "fortran_binary:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "numpy>=2.2.6",
+    "pytest>=8.3.5",
+]
