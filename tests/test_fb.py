@@ -351,7 +351,7 @@ class TestFortranBinary:
         with pytest.raises(IOError):
             FortranBinary(ffile)
 
-    @mock.patch("fortran_binary.open")
+    @mock.patch("fortran_binary.io.open")
     def test_open_new(self, mock_open):
         ffile = self.tdir / "newfile"
         FortranBinary(ffile, "wb")
