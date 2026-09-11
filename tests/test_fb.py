@@ -13,7 +13,8 @@ class TestFortranBinary:
         self.tdir = pathlib.Path(__file__).parent / "test_fb.d"
 
     def test_1(self):
-        """Read int, float
+        """
+        Read int, float
 
           integer, parameter :: n = 3
           double precision x(n)
@@ -23,23 +24,31 @@ class TestFortranBinary:
           write(1) x
           close(1)
           end
+
         """
+
         ffile = self.tdir / "fort.1"
         fb = FortranBinary(ffile)
-        # first record is int 3
-        next(fb)
-        n = fb.readbuf(1, "i")[0]
+
+        # first record is int n =3
+
+        rec = next(fb)
+        n = rec.read(1, "i")[0]
         assert n == 3
 
-        # first record is float 1. 2. 3.
-        next(fb)
+        # first record is float x=(1. 2. 3.)
+
+        rec = next(fb)
+        x = rec.read(n, "d")
         xref = (1.0, 2.0, 3.0)
-        x = fb.readbuf(n, "d")
         np.testing.assert_allclose(x, xref)
         fb.close()
 
     def test_1_cm(self):
-        """Case 1 with context manager"""
+        """
+        Case 1 with context manager
+        """
+
         ffile = self.tdir / "fort.1"
         with FortranBinary(ffile) as fb:
             n = next(fb).read(1, "i")[0]
@@ -54,18 +63,20 @@ class TestFortranBinary:
         assert record.as_array() == array.array('d', (1.0, 2.0, 3.0))
 
     def test_2(self):
-        """Find and read label
-
-          character*5 lab
-          integer n
-          lab = 'LABEL'
-          n = 0
-          open(1, file='fort.2', status='new', form='unformatted')
-          write(1) n
-          write(1) lab
-          close(1)
-          end
         """
+        Find and read label
+
+        character*5 lab
+        integer n
+        lab = 'LABEL'
+        n = 0
+        open(1, file='fort.2', status='new', form='unformatted')
+        write(1) n
+        write(1) lab
+        close(1)
+        end
+        """
+
         ffile = self.tdir / "fort.2"
         fb = FortranBinary(ffile)
         rec = fb.find(b"LABEL")
@@ -77,6 +88,7 @@ class TestFortranBinary:
         """
         Case 2 with context manager
         """
+
         ffile = self.tdir / "fort.2"
         with FortranBinary(ffile) as fb:
             rec = fb.find(b"LABEL")
@@ -86,13 +98,15 @@ class TestFortranBinary:
         """
         Case 2 with str method
         """
+
         ffile = self.tdir / "fort.2"
         with FortranBinary(ffile) as fb:
             rec = fb.find(b"LABEL")
         assert rec.data.decode("utf-8") == "LABEL"
 
     def test_2b(self):
-        """Handle label not found
+        """
+        Handle label not found
 
           character*5 lab
           integer n
@@ -103,7 +117,9 @@ class TestFortranBinary:
           write(1) lab
           close(1)
           end
+
         """
+
         ffile = self.tdir / "fort.2"
         fb = FortranBinary(ffile)
         rec = fb.find(b"NOLABEL")
@@ -170,46 +186,58 @@ class TestFortranBinary:
         next(fb)
         x = []
         for rec in fb:
-            x += list(fb.readbuf(3, "d"))
+            x += list(rec.read(3, "d"))
         xref = (1.0, 2.0, 3.0, 5.0, 6.0, 7.0)
         np.testing.assert_allclose(x, xref)
         fb.close()
 
     def test_3b_cm(self):
-        """Case 3b with context manager"""
+        """
+        Case 3b with context manager
+        """
+
         ffile = self.tdir / "fort.3"
         with FortranBinary(ffile) as fb:
             next(fb)
             x = []
             for rec in fb:
-                x += list(fb.readbuf(3, "d"))
+                x += list(rec.read(3, "d"))
         xref = (1.0, 2.0, 3.0, 5.0, 6.0, 7.0)
         np.testing.assert_allclose(x, xref)
 
     def test_4(self):
-        """Read string
-
-        character*3 x
-        x = 'ABC'
-        open(4, file='fort.4', status='new', form='unformatted')
-        write(4) x
-        close(4)
-        end
         """
+        Read string
+
+          character*3 x
+          x = 'ABC'
+          open(4, file='fort.4', status='new', form='unformatted')
+          write(4) x
+          close(4)
+          end
+
+        """
+
         ffile = self.tdir / "fort.4"
         fb = FortranBinary(ffile)
         rec = fb.find("ABC")
         assert b"ABC" in rec
 
     def test_4_cm(self):
-        """Case 4 with context manager"""
+        """
+        Case 4 with context manager
+        """
+
         ffile = self.tdir / "fort.4"
         with FortranBinary(ffile) as fb:
             rec = fb.find("ABC")
         assert b"ABC" in rec
 
     def test_4b(self):
-        """Read string"""
+        """
+        Read string
+        """
+
         ffile = self.tdir / "fort.4"
         fb = FortranBinary(ffile)
         rec = fb.find(b"ABC")
@@ -217,14 +245,20 @@ class TestFortranBinary:
         fb.close()
 
     def test_4b_cm(self):
-        """Read string with context manager"""
+        """
+        Read string with context manager
+        """
+
         ffile = self.tdir / "fort.4"
         with FortranBinary(ffile) as fb:
             rec = fb.find(b"ABC")
         assert b"ABC" in rec
 
     def test_4c(self):
-        """Read string"""
+        """
+        Read string
+        """
+
         ffile = self.tdir / "fort.4"
         fb = FortranBinary(ffile)
         with pytest.raises(ValueError):
@@ -232,14 +266,20 @@ class TestFortranBinary:
         fb.close()
 
     def test_4c_cm(self):
-        """Read string with context manager"""
+        """
+        Read string with context manager
+        """
+
         ffile = self.tdir / "fort.4"
         with FortranBinary(ffile) as fb:
             with pytest.raises(ValueError):
                 fb.find(1.0)
 
     def test_4d(self):
-        """Read string"""
+        """
+        Read string
+        """
+
         ffile = self.tdir / "fort.4"
         fb = FortranBinary(ffile)
         rec = next(fb)
@@ -247,7 +287,10 @@ class TestFortranBinary:
         fb.close()
 
     def test_4d_warn(self):
-        """Read string"""
+        """
+        Read string
+        """
+
         ffile = self.tdir / "fort.4"
         fb = FortranBinary(ffile)
         next(fb)
@@ -256,7 +299,10 @@ class TestFortranBinary:
         fb.close()
 
     def test_4d_cm(self):
-        """Read string with context manager"""
+        """
+        Read string with context manager
+        """
+
         ffile = self.tdir / "fort.4"
         with FortranBinary(ffile) as fb:
             rec = next(fb)
