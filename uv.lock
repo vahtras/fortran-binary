@@ -20,6 +20,7 @@ source = { editable = "." }
 dev = [
     { name = "numpy" },
     { name = "pytest" },
+    { name = "pytest-regex" },
 ]
 
 [package.metadata]
@@ -28,6 +29,7 @@ dev = [
 dev = [
     { name = "numpy", specifier = ">=2.2.6" },
     { name = "pytest", specifier = ">=8.3.5" },
+    { name = "pytest-regex", specifier = ">=0.2.0" },
 ]
 
 [[package]]
@@ -153,4 +155,16 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/e4/47/b9efed96c114afcfa3c9d3fe98a76a1d14c74a9e266d397cf6eb64be5e01/pytest-9.1.1.tar.gz", hash = "sha256:1088fbde8f2b49d95a549a195707afa7a76a3ce9bcadc26b6d71f0ffda5fe313", size = 1636369, upload-time = "2026-06-19T10:58:32.857Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/24/25/1de2678b631f5a49215c6c96fff41ba892b0a34df68d6d80292b1b48aa7f/pytest-9.1.1-py3-none-any.whl", hash = "sha256:37a86b45efb9a47a61a36449063e8e18d0cab3161329fc099eb21783169c4f0c", size = 386536, upload-time = "2026-06-19T10:58:31.347Z" },
+]
+
+[[package]]
+name = "pytest-regex"
+version = "0.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/73/67/e3f3700e8f95fc9e80ab83d589346c117de4e6d01e6b922f7300282e7fc9/pytest-regex-0.2.0.tar.gz", hash = "sha256:f4076c49abece2503815c8b2e282a8fd22d330f06f9bf91d620b3ef02de7a353", size = 4097, upload-time = "2023-05-29T22:08:11.071Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2a/72/d4143c66c1806599358c119c0af530bab92ef0c48129f17522dfd5a7ff6a/pytest_regex-0.2.0-py3-none-any.whl", hash = "sha256:c97e9c49e8c7e7482bd1fa701e3a5cccd18eb78d263752e32dba4937d8cee6d9", size = 3824, upload-time = "2023-05-29T22:08:09.551Z" },
 ]

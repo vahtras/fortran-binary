@@ -18,7 +18,6 @@ class FortranBinary:
     def __init__(self, name, mode="rb"):
         self.name = name
         self.file = open(name, mode)
-        self.data = None
         self.rec = None
 
     @property
@@ -36,20 +35,13 @@ class FortranBinary:
         head = self.file.read(self.pad)
         if head:
             record_size = struct.unpack("i", head)[0]
-            self.data = self.file.read(record_size)
+            record_data = self.file.read(record_size)
             tail = self.file.read(self.pad)
             assert head == tail
-            self.rec = Rec(self.data)
+            self.rec = Rec(record_data)
             return self.rec
         else:
             raise StopIteration
-
-    def readbuf(self, num, fmt):
-        """
-        Read data from current record
-        """
-        vec = self.rec.read(num, fmt)
-        return vec
 
     def find(self, label):
         """
@@ -80,8 +72,8 @@ class FortranBinary:
     def __enter__(self, *args, **kwargs):
         return self
 
-    def __exit__(self, *args, **kwargs):
-        pass
+    def __exit__(self, *args):
+        self.file.close()
 
     def __getattr__(self, attr):
         """
@@ -90,7 +82,7 @@ class FortranBinary:
         return getattr(self.file, attr)
 
 
-class Rec(object):
+class Rec:
     """
     Representation of a single Fortran record
     """
@@ -119,12 +111,7 @@ class Rec(object):
         start, stop = self.loc, self.loc + struct.calcsize(fmt * num)
         vec = struct.unpack(fmt * num, self.data[start:stop])
         self.loc = stop
-        return vec
-
-    def as_array(self, fmt='d'):
-        size_of_fmt = struct.calcsize(fmt)
-        data = self.read(len(self) // size_of_fmt, fmt)
-        return array.array(fmt, data)
+        return array.array(fmt, vec)
 
 
 def main():

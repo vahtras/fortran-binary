@@ -36,12 +36,13 @@ class TestFortranBinary:
         n = rec.read(1, "i")[0]
         assert n == 3
 
-        # first record is float x=(1. 2. 3.)
+        # second record is float x=(1. 2. 3.)
 
         rec = next(fb)
         x = rec.read(n, "d")
-        xref = (1.0, 2.0, 3.0)
-        np.testing.assert_allclose(x, xref)
+        xref = array.array('d', (1.0, 2.0, 3.0))
+        assert x == xref
+
         fb.close()
 
     def test_1_cm(self):
@@ -53,28 +54,30 @@ class TestFortranBinary:
         with FortranBinary(ffile) as fb:
             n = next(fb).read(1, "i")[0]
             x = next(fb).read(n, "d")
+
         np.testing.assert_allclose(x, (1.0, 2.0, 3.0))
 
     def test_1_as_float(self):
         ffile = self.tdir / "fort.1"
         for record in FortranBinary(ffile):
-            pass
+            pass #exit loop with last record on file
 
-        assert record.as_array() == array.array('d', (1.0, 2.0, 3.0))
+        assert record.read(3, 'd') == array.array('d', (1.0, 2.0, 3.0))
 
     def test_2(self):
         """
         Find and read label
 
-        character*5 lab
-        integer n
-        lab = 'LABEL'
-        n = 0
-        open(1, file='fort.2', status='new', form='unformatted')
-        write(1) n
-        write(1) lab
-        close(1)
-        end
+          character*5 lab
+          integer n
+          lab = 'LABEL'
+          n = 0
+          open(1, file='fort.2', status='new', form='unformatted')
+          write(1) n
+          write(1) lab
+          close(1)
+          end
+
         """
 
         ffile = self.tdir / "fort.2"
@@ -137,7 +140,8 @@ class TestFortranBinary:
         assert rec is None
 
     def test_3a(self):
-        """Integer*8 dimensions
+        """
+        Integer*8 dimensions
 
           integer*8, parameter :: nx = 3, ny=3
           double precision x(nx), y(ny)
@@ -151,22 +155,27 @@ class TestFortranBinary:
           end
 
         """
+
         ffile = self.tdir / "fort.3"
         fb = FortranBinary(ffile)
         # first record is int 3, 3
-        nx, ny = next(fb).read("q", 2)
+        nx, ny = next(fb).read(2, "q")
         np.testing.assert_allclose((nx, ny), (3, 3))
         fb.close()
 
     def test_3a_cm(self):
-        """Case 3a with context manager """
+        """
+        Case 3a with context manager
+        """
+
         ffile = self.tdir / "fort.3"
         with FortranBinary(ffile) as fb:
-            nx, ny = next(fb).read("q", 2)
+            nx, ny = next(fb).read(2, "q")
         np.testing.assert_allclose((nx, ny), (3, 3))
 
     def test_3b(self):
-        """Read vecs
+        """
+        Read vecs
 
           integer, parameter :: nx = 3, ny=3
           double precision x(nx), y(ny)
@@ -180,6 +189,7 @@ class TestFortranBinary:
           end
 
         """
+
         ffile = self.tdir / "fort.3"
         fb = FortranBinary(ffile)
         # first record is int 3
@@ -187,8 +197,9 @@ class TestFortranBinary:
         x = []
         for rec in fb:
             x += list(rec.read(3, "d"))
-        xref = (1.0, 2.0, 3.0, 5.0, 6.0, 7.0)
-        np.testing.assert_allclose(x, xref)
+        x = array.array('d', x)
+        xref = array.array('d', (1.0, 2.0, 3.0, 5.0, 6.0, 7.0))
+        assert x == xref
         fb.close()
 
     def test_3b_cm(self):
@@ -202,8 +213,10 @@ class TestFortranBinary:
             x = []
             for rec in fb:
                 x += list(rec.read(3, "d"))
-        xref = (1.0, 2.0, 3.0, 5.0, 6.0, 7.0)
-        np.testing.assert_allclose(x, xref)
+
+        x = array.array('d', x)
+        xref = array.array('d', (1.0, 2.0, 3.0, 5.0, 6.0, 7.0))
+        assert x == xref
 
     def test_4(self):
         """
@@ -231,6 +244,7 @@ class TestFortranBinary:
         ffile = self.tdir / "fort.4"
         with FortranBinary(ffile) as fb:
             rec = fb.find("ABC")
+
         assert b"ABC" in rec
 
     def test_4b(self):
@@ -309,6 +323,10 @@ class TestFortranBinary:
         assert len(rec) == 3
 
     def test_count_records_and_lengths(self):
+        """
+        Test record lengths on test file fort.3 (16, 24, 24)
+        """
+
         ffile = self.tdir / "fort.3"
         fb = FortranBinary(ffile)
         assert fb.record_byte_lengths() == (16, 24, 24)
